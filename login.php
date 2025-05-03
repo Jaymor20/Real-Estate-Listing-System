@@ -1,5 +1,6 @@
 <?php
 include_once("connection.php");
+include_once("functions.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = htmlspecialchars(trim($_POST['email']));
@@ -13,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (password_verify($password, $row['password'])) {
                 $_SESSION["role"] = $row['role'];
                 $_SESSION["user_id"] = $row['user_id'];
+                logAction($conn, $_SESSION['user_id'], "Logged in");
                 header("Location: dashboard.php");
                 exit();
             } else {

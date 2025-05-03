@@ -1,7 +1,11 @@
 <?php
 include_once("connection.php");
 include_once("functions.php");
-
+function logAction($conn, $user_id, $action) {
+    $stmt = $conn->prepare("INSERT INTO AccessLogs (user_id, action) VALUES (?, ?)");
+    $stmt->bind_param("is", $user_id, $action);
+    $stmt->execute();
+}
 if (!isAdmin()) {
     header("Location: dashboard.php");
     exit();
@@ -14,6 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("UPDATE Users SET role = ? WHERE user_id = ?");
     $stmt->bind_param("si", $new_role, $user_id);
     $stmt->execute();
+
+    logAction($conn, $_SESSION['user_id'], "Changed role of user ID $user_id to $new_role");
 }
 
 $users = $conn->query("SELECT user_id, name, email, role FROM Users");
